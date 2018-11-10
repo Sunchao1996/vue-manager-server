@@ -5,6 +5,7 @@ import com.sc.sys.dao.SysRoleResourceDao;
 import com.sc.sys.model.SysResource;
 import com.sc.sys.model.SysRole;
 import com.sc.sys.model.SysRolesResources;
+import com.sc.util.string.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +54,9 @@ public class SysRoleService {
     public List<SysRolesResources> createRolesResourcesList(Integer roleId, String resources) {
         String[] resourceArray = resources.split("@");
         List<SysRolesResources> list = new ArrayList<>();
+        if (resourceArray.length == 1 && StringUtil.isNullOrEmpty(resourceArray[0])) {
+            return new ArrayList<>();
+        }
         for (String temp : resourceArray) {
             SysRolesResources sysRolesResources = new SysRolesResources();
             sysRolesResources.setRoleId(roleId);
