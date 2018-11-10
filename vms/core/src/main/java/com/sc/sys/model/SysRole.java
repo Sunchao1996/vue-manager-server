@@ -1,6 +1,7 @@
 package com.sc.sys.model;
 
 import com.sc.sys.dao.SysRoleDao;
+import org.hibernate.validator.constraints.NotBlank;
 
 import java.util.Date;
 
@@ -12,8 +13,9 @@ import java.util.Date;
 public class SysRole {
     private Integer id;
     private String roleName;
+    @NotBlank
     private String roleCode;
-    private Integer roleStatue;
+    private Integer roleStatus;
     private Date createTime;
     private String resourcesIds;
 
@@ -23,7 +25,7 @@ public class SysRole {
                 "id=" + id +
                 ", roleName='" + roleName + '\'' +
                 ", roleCode='" + roleCode + '\'' +
-                ", roleStatue=" + roleStatue +
+                ", roleStatus=" + roleStatus +
                 ", createTime=" + createTime +
                 ", resourcesIds='" + resourcesIds + '\'' +
                 '}';
@@ -56,12 +58,12 @@ public class SysRole {
         return this;
     }
 
-    public Integer getRoleStatue() {
-        return roleStatue;
+    public Integer getRoleStatus() {
+        return roleStatus;
     }
 
-    public SysRole setRoleStatue(Integer roleStatue) {
-        this.roleStatue = roleStatue;
+    public SysRole setRoleStatus(Integer roleStatus) {
+        this.roleStatus = roleStatus;
         return this;
     }
 

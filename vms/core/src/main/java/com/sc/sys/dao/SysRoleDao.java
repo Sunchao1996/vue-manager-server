@@ -22,9 +22,9 @@ public class SysRoleDao extends BaseDao<SysRole, SysRoleSearchVO> {
     /**
      * 新增角色
      */
-    public int save(SysRole sysRole) {
+    public Integer save(SysRole sysRole) {
         String sql = "insert into td_sys_roles (" + INSERT_FIELD + ") values (" + INSERT_VALUES_FIELD + ")";
-        return insert(sql, sysRole);
+        return insertForId(sql, sysRole,"id");
     }
 
     /**

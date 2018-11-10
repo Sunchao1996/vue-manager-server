@@ -2,10 +2,12 @@ package com.sc.sys.service;
 
 import com.sc.sys.dao.SysRoleDao;
 import com.sc.sys.dao.SysRoleResourceDao;
+import com.sc.sys.model.SysResource;
 import com.sc.sys.model.SysRole;
 import com.sc.sys.model.SysRolesResources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +27,13 @@ public class SysRoleService {
     /**
      * 新增角色
      */
+    @Transactional
     public int save(SysRole sysRole) {
-        int flag = sysRoleDao.save(sysRole);
-        flag += sysRoleResourceDao.batchAdd(createRolesResourcesList(sysRole.getId(), sysRole.getResourcesIds()));
+        Integer roleId = sysRoleDao.save(sysRole);
+        if (roleId == null || roleId == 0) {
+            return 0;
+        }
+        int flag = sysRoleResourceDao.batchAdd(createRolesResourcesList(roleId, sysRole.getResourcesIds()));
         return flag;
     }
 
@@ -76,7 +82,15 @@ public class SysRoleService {
      * 根据id查询
      */
     public SysRole getById(Integer id) {
-        return sysRoleDao.getById(id);
+        SysRole sysRole = sysRoleDao.getById(id);
+        List<SysResource> resourceList = sysRoleResourceDao.listResourcesByRoleId(id);
+        StringBuffer resourcesIdsBuf = new StringBuffer();
+        for (SysResource sysResource : resourceList) {
+            resourcesIdsBuf.append(sysResource.getId());
+            resourcesIdsBuf.append("@");
+        }
+        sysRole.setResourcesIds(resourcesIdsBuf.toString());
+        return sysRole;
     }
 
     /**
