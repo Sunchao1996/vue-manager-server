@@ -21,6 +21,15 @@ public class SysUser {
     private String userPassword;
     private String randomCode;
     private String userIp;
+    private Boolean userStatusB;
+
+    public Boolean getUserStatusB() {
+        if(this.userStatus == 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     @Override
     public String toString() {

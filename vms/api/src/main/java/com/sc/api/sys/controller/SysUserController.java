@@ -1,5 +1,9 @@
 package com.sc.api.sys.controller;
 
+import com.sc.common.page.PageDto;
+import com.sc.sys.model.SysUser;
+import com.sc.sys.service.SysUserService;
+import com.sc.sys.vo.SysUserSearchVO;
 import com.sc.util.code.EnumReturnCode;
 import com.sc.util.json.JsonResult;
 import com.sc.util.redis.RedisKey;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +28,8 @@ import java.util.Map;
 public class SysUserController {
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private SysUserService sysUserService;
 
     @RequestMapping(value = "/info", method = RequestMethod.POST)
     public JsonResult info(@RequestBody Map<String, String> paramsMap) {
@@ -34,5 +41,23 @@ public class SysUserController {
             return new JsonResult(EnumReturnCode.FAIL_INFO_GET);
         }
         return new JsonResult(EnumReturnCode.SUCCESS_INFO_GET, webSession);
+    }
+
+    /**
+     * 根据条件查询
+     */
+    @RequestMapping(value = "list", method = RequestMethod.POST)
+    public JsonResult list(@RequestBody SysUserSearchVO sysUserSearchVO) {
+        List<SysUser> list = sysUserService.listBySearch(sysUserSearchVO);
+        Integer count = sysUserService.count(sysUserSearchVO);
+        PageDto pageDto = new PageDto(sysUserSearchVO.getPageIndex(), count, list);
+        return new JsonResult(EnumReturnCode.SUCCESS_INFO_GET, pageDto);
+    }
+    /**
+     * 根据id修改状态
+     */
+    @RequestMapping(value = "/updateStatus",method = RequestMethod.POST)
+    public JsonResult updateStatus(){
+        return null;
     }
 }

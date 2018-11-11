@@ -83,13 +83,13 @@ public class SysUserDao extends BaseDao<SysUser, SysUserSearchVO> {
     private String createSearchSQL(SysUserSearchVO sysUserSearchVO) {
         String search = "";
         if (StringUtil.isNotNullOrEmpty(sysUserSearchVO.getUserName())) {
-            search += " userName like :userNameStr ";
+            search += " and userName like :userNameStr ";
         }
         if (StringUtil.isNotNullOrEmpty(sysUserSearchVO.getUserRealName())) {
-            search += " userRealName like :userRealNameStr ";
+            search += " and userRealName like :userRealNameStr ";
         }
         if (sysUserSearchVO.getUserStatus() != null) {
-            search += " userStatus =:userStatus ";
+            search += " and userStatus =:userStatus ";
         }
         return search;
     }
@@ -98,10 +98,9 @@ public class SysUserDao extends BaseDao<SysUser, SysUserSearchVO> {
      * 根据条件统计个数
      */
     public int count(SysUserSearchVO sysUserSearchVO) {
-        String sql = "select count(1) from td_sys_users where 1=1 ";
+        String sql = "select count(*) from td_sys_users where 1=1 ";
         sql += createSearchSQL(sysUserSearchVO);
-        sql = PageUtil.createMysqlPageSql(sql, sysUserSearchVO.getPageIndex());
-        return count(sql);
+        return count(sql,sysUserSearchVO);
     }
 
     /**
