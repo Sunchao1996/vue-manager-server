@@ -53,11 +53,36 @@ public class SysUserController {
         PageDto pageDto = new PageDto(sysUserSearchVO.getPageIndex(), count, list);
         return new JsonResult(EnumReturnCode.SUCCESS_INFO_GET, pageDto);
     }
+
     /**
      * 根据id修改状态
      */
-    @RequestMapping(value = "/updateStatus",method = RequestMethod.POST)
-    public JsonResult updateStatus(){
-        return null;
+    @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
+    public JsonResult updateStatus(@RequestBody Map<String, String> paramsMap) {
+        if (paramsMap == null || paramsMap.get("usid") == null) {
+            return new JsonResult(EnumReturnCode.FAIL_OPERA);
+        }
+        int flag = sysUserService.updateStatus(Integer.valueOf(paramsMap.get("usid")));
+        if (flag > 0) {
+            return new JsonResult(EnumReturnCode.SUCCESS_OPERA);
+        } else {
+            return new JsonResult(EnumReturnCode.FAIL_OPERA);
+        }
+    }
+
+    /**
+     * 根据id重置密码为123456
+     */
+    @RequestMapping(value = "/updateResetPwd", method = RequestMethod.POST)
+    public JsonResult updateResetPwd(@RequestBody Map<String, String> paramsMap) {
+        if (paramsMap == null || paramsMap.get("usid") == null) {
+            return new JsonResult(EnumReturnCode.FAIL_OPERA);
+        }
+        int flag = sysUserService.updateResetPwd(Integer.valueOf(paramsMap.get("usid")));
+        if (flag > 0) {
+            return new JsonResult(EnumReturnCode.SUCCESS_OPERA);
+        } else {
+            return new JsonResult(EnumReturnCode.FAIL_OPERA);
+        }
     }
 }

@@ -68,8 +68,16 @@ public class SysUserService {
     /**
      * 修改用户状态
      */
-    public int updateStatus(Integer userStatus, Integer userId) {
-        if (userStatus == null || userId == null) {
+    public int updateStatus(Integer userId) {
+        if (userId == null) {
+            return -1;
+        }
+        SysUser sysUser = sysUserDao.getById(userId);
+        if (sysUser == null) {
+            return -1;
+        }
+        Integer userStatus = sysUser.getUserStatus();
+        if (userStatus == null) {
             return -1;
         }
         if (userStatus == 0) {
@@ -137,5 +145,25 @@ public class SysUserService {
     public static void main(String[] args) {
         Md5SaltUtil md5SaltUtil = new Md5SaltUtil("@@@@@");
         System.out.println(md5SaltUtil.encode("123456"));
+    }
+
+    /**
+     * 根据id重置密码为123456
+     *
+     * @param userId
+     * @return
+     */
+    public int updateResetPwd(Integer userId) {
+        if (userId == null) {
+            return -1;
+        }
+        SysUser sysUser = sysUserDao.getById(userId);
+        if (sysUser == null) {
+            return -1;
+        }
+        String random = RandomCodeUtil.createRandomCode(6);
+        Md5SaltUtil md5SaltUtil = new Md5SaltUtil(random);
+        String pwd = md5SaltUtil.encode("123456");
+        return sysUserDao.updateResetPwd(userId, pwd, random);
     }
 }

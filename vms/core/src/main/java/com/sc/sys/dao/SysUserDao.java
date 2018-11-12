@@ -18,7 +18,7 @@ import java.util.List;
 public class SysUserDao extends BaseDao<SysUser, SysUserSearchVO> {
     public static String INSERT_FIELD = "userName,userMobile,userRealName,userAvatar,userIntroduction,userStatus,userPassword,randomCode";
     public static String INSERT_VALUES_FIELD = ":userName,:userMobile,:userRealName,:userAvatar,:userIntroduction,:userStatus,:userPassword,:randomCode";
-    public static String UPDATE_FIELD = "userName=:userName,userMobile=:userMobile,userRealName=:userRealName,userAvatar=:userAvatar,userIntroduction=:userIntroduction,userStatus=:userStatus";
+    public static String UPDATE_FIELD = "userName=:userName,userMobile=:userMobile,userRealName=:userRealName,userAvatar=:userAvatar,userIntroduction=:userIntroduction";
     public static String BASE_FIELD = "id,userName,userMobile,userRealName,userAvatar,userIntroduction,userStatus,userPassword,randomCode";
 
     /**
@@ -100,7 +100,7 @@ public class SysUserDao extends BaseDao<SysUser, SysUserSearchVO> {
     public int count(SysUserSearchVO sysUserSearchVO) {
         String sql = "select count(*) from td_sys_users where 1=1 ";
         sql += createSearchSQL(sysUserSearchVO);
-        return count(sql,sysUserSearchVO);
+        return count(sql, sysUserSearchVO);
     }
 
     /**
@@ -119,6 +119,14 @@ public class SysUserDao extends BaseDao<SysUser, SysUserSearchVO> {
     public int updateToken(Integer userId, String userToken) {
         String sql = "update td_sys_users set userToken=? where id=?";
         return update(sql, userToken, userId);
+    }
+
+    /**
+     * 修改用户密码
+     */
+    public int updateResetPwd(Integer userId, String pwd,String random) {
+        String sql = "update td_sys_users set userPassword=?,randomCode=? where id=?";
+        return update(sql, pwd, random,userId);
     }
 
 }
