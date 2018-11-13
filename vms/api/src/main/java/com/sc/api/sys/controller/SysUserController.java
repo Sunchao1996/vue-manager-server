@@ -85,4 +85,17 @@ public class SysUserController {
             return new JsonResult(EnumReturnCode.FAIL_OPERA);
         }
     }
+
+    /**
+     * 检验用户名是否可用
+     */
+    @RequestMapping(value = "/checkUserCode", method = RequestMethod.POST)
+    public JsonResult checkUserName(@RequestBody SysUserSearchVO sysUserSearchVO) {
+        SysUser sysUser = sysUserService.getByUserName(sysUserSearchVO.getUserName());
+        if (sysUser != null) {
+            return new JsonResult(EnumReturnCode.SUCCESS_INFO_GET, false);
+        } else {
+            return new JsonResult(EnumReturnCode.SUCCESS_INFO_GET, true);
+        }
+    }
 }
