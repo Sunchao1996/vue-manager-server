@@ -1,19 +1,27 @@
 package com.sc.sys.service;
 
+import com.sc.core.pub.PubConfig;
 import com.sc.sys.dao.SysUserDao;
 import com.sc.sys.dao.SysUserRoleDao;
 import com.sc.sys.model.SysRolesResources;
 import com.sc.sys.model.SysUser;
 import com.sc.sys.model.SysUsersRoles;
 import com.sc.sys.vo.SysUserSearchVO;
+import com.sc.util.base64.Base64Util;
 import com.sc.util.code.RandomCodeUtil;
+import com.sc.util.date.DateUtil;
 import com.sc.util.encrypt.Md5SaltUtil;
 import com.sc.util.page.PageUtil;
 import com.sc.util.string.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,16 +35,40 @@ public class SysUserService {
     private SysUserDao sysUserDao;
     @Autowired
     private SysUserRoleDao sysUserRoleDao;
+    @Autowired
+    private PubConfig pubConfig;
 
     /**
      * 新增用户
      */
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT)
     public int save(SysUser sysUser) {
         sysUser.setRandomCode(RandomCodeUtil.createRandomCode(6));
         Md5SaltUtil md5SaltUtil = new Md5SaltUtil(sysUser.getRandomCode());
         sysUser.setUserPassword(md5SaltUtil.encode("123456"));
-        int flag = sysUserDao.save(sysUser);
-        flag += sysUserRoleDao.batchAdd(createUsersRolesList(sysUser.getId(), sysUser.getRoles()));
+        //保存头像
+        String file = sysUser.getUserAvatar();
+        if (StringUtil.isNullOrEmpty(file)) {
+            //默认头像
+            sysUser.setUserAvatar("https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif");
+        } else {
+            //配置文件图片上传路径
+            String filePath = pubConfig.getImageUploadPath();
+            String saveUrl = File.separator + "users" + File.separator + DateUtil.getShortSystemDate() + File.separator;
+            //后缀
+            String ext = file.substring(file.indexOf("/") + 1, file.indexOf(";"));
+            //数据部分
+            String fileImageData = file.substring(file.indexOf(",") + 1);
+            String newFileName = new Date().getTime() + "." + ext;
+            File saveDirFile = new File(filePath + saveUrl);
+            if (!saveDirFile.exists()) {
+                saveDirFile.mkdirs();
+            }
+            Base64Util.generateImage(fileImageData, filePath + saveUrl + newFileName);
+            sysUser.setUserAvatar(pubConfig.getImageServer() + saveUrl + newFileName);
+        }
+        int key = sysUserDao.save(sysUser);
+        int flag = sysUserRoleDao.batchAdd(createUsersRolesList(key, sysUser.getRoles()));
         return flag;
     }
 

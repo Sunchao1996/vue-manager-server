@@ -60,7 +60,12 @@ public class CheckAuthorizationInterceptor implements HandlerInterceptor {
             if (request.getMethod().equals("GET")) {
                 parameters = StringUtil.getOperaParams(request);
             } else {
-                ServletInputStream streams = ((BodyReaderHttpServletRequestWrapper) request).getInputStream();
+                ServletInputStream streams = null;
+                if (request instanceof HttpServletRequest) {
+                    streams = ((BodyReaderHttpServletRequestWrapper) request).getInputStream();
+                } else {
+                    streams = request.getInputStream();
+                }
                 StringBuilder content = new StringBuilder();
                 byte[] b = new byte[1024];
                 int lens = -1;
@@ -89,7 +94,7 @@ public class CheckAuthorizationInterceptor implements HandlerInterceptor {
             } else {
                 //請求路徑不再允许范围之内
                 String manageUrl = webSession.getManageUrl();
-                if (manageUrl.indexOf(path) == -1 && checkUrl(path.substring(path.lastIndexOf("/")+1))) {
+                if (manageUrl.indexOf(path) == -1 && checkUrl(path.substring(path.lastIndexOf("/") + 1))) {
                     JsonResult jsonResult = new JsonResult(EnumReturnCode.FAIL_NOAUTH);
                     jsonResult.setMsg("无权限访问，请联系管理员！");
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());//状态设置为未授权
@@ -107,6 +112,7 @@ public class CheckAuthorizationInterceptor implements HandlerInterceptor {
         Matcher matcher = pattern.matcher(url);
         return matcher.matches();
     }
+
     /**
      * 记录文本日志
      *

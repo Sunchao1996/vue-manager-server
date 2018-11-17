@@ -26,7 +26,7 @@ public class SysUserDao extends BaseDao<SysUser, SysUserSearchVO> {
      */
     public int save(SysUser sysUser) {
         String sql = "insert into td_sys_users (" + INSERT_FIELD + ") values (" + INSERT_VALUES_FIELD + ")";
-        return insert(sql, sysUser);
+        return insertForId(sql, sysUser,"id");
     }
 
     /**

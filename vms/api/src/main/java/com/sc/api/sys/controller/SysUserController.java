@@ -98,4 +98,30 @@ public class SysUserController {
             return new JsonResult(EnumReturnCode.SUCCESS_INFO_GET, true);
         }
     }
+
+    /**
+     * 新增用户
+     */
+    @RequestMapping(value = "/addUser", method = RequestMethod.POST)
+    public JsonResult save(@RequestBody SysUser sysUser) {
+        int flag = sysUserService.save(sysUser);
+        if (flag > 0) {
+            return new JsonResult(EnumReturnCode.SUCCESS_OPERA);
+        } else {
+            return new JsonResult(EnumReturnCode.FAIL_OPERA);
+        }
+    }
+
+    /**
+     * 根据用户id删除用户
+     */
+    @RequestMapping(value = "/deleteUser", method = RequestMethod.POST)
+    public JsonResult delete(@RequestBody SysUser sysUser) {
+        int flag = sysUserService.deleteById(sysUser.getId());
+        if (flag > 0) {
+            return new JsonResult(EnumReturnCode.SUCCESS_OPERA);
+        } else {
+            return new JsonResult(EnumReturnCode.FAIL_OPERA);
+        }
+    }
 }
