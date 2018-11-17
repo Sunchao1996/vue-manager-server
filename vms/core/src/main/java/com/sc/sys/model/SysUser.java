@@ -1,5 +1,7 @@
 package com.sc.sys.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 
 /**
@@ -12,14 +14,18 @@ public class SysUser {
     private String userName;
     private String userMobile;
     private String userRealName;
+    @JsonIgnore
     private String userToken;
     private Date userLastLoginTime;
     private String userAvatar;
     private String userIntroduction;
     private Integer userStatus;
     private String roles;
+    @JsonIgnore
     private String userPassword;
+    @JsonIgnore
     private String randomCode;
+    @JsonIgnore
     private String userIp;
     private Boolean userStatusB;
 

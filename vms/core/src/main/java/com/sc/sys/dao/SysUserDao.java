@@ -18,7 +18,7 @@ import java.util.List;
 public class SysUserDao extends BaseDao<SysUser, SysUserSearchVO> {
     public static String INSERT_FIELD = "userName,userMobile,userRealName,userAvatar,userIntroduction,userStatus,userPassword,randomCode";
     public static String INSERT_VALUES_FIELD = ":userName,:userMobile,:userRealName,:userAvatar,:userIntroduction,:userStatus,:userPassword,:randomCode";
-    public static String UPDATE_FIELD = "userName=:userName,userMobile=:userMobile,userRealName=:userRealName,userAvatar=:userAvatar,userIntroduction=:userIntroduction";
+    public static String UPDATE_FIELD = "userMobile=:userMobile,userRealName=:userRealName,userAvatar=:userAvatar,userIntroduction=:userIntroduction,userStatus=:userStatus ";
     public static String BASE_FIELD = "id,userName,userMobile,userRealName,userAvatar,userIntroduction,userStatus,userPassword,randomCode";
 
     /**

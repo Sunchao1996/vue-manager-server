@@ -124,4 +124,26 @@ public class SysUserController {
             return new JsonResult(EnumReturnCode.FAIL_OPERA);
         }
     }
+
+    /**
+     * 修改用户信息
+     */
+    @RequestMapping(value = "/updateUser", method = RequestMethod.POST)
+    public JsonResult updateUser(@RequestBody SysUser sysUser) {
+        int flag = sysUserService.updateById(sysUser);
+        if (flag > 0) {
+            return new JsonResult(EnumReturnCode.SUCCESS_OPERA);
+        } else {
+            return new JsonResult(EnumReturnCode.FAIL_OPERA);
+        }
+    }
+
+    /**
+     * 根据用户id获取用户信息
+     */
+    @RequestMapping(value = "/getById", method = RequestMethod.POST)
+    public JsonResult getById(@RequestBody SysUser sysUser) {
+        SysUser getObj = sysUserService.getById(sysUser.getId());
+        return new JsonResult(EnumReturnCode.SUCCESS_INFO_GET, getObj);
+    }
 }

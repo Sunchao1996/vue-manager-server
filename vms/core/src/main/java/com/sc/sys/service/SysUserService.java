@@ -3,6 +3,7 @@ package com.sc.sys.service;
 import com.sc.core.pub.PubConfig;
 import com.sc.sys.dao.SysUserDao;
 import com.sc.sys.dao.SysUserRoleDao;
+import com.sc.sys.model.SysRole;
 import com.sc.sys.model.SysRolesResources;
 import com.sc.sys.model.SysUser;
 import com.sc.sys.model.SysUsersRoles;
@@ -13,6 +14,7 @@ import com.sc.util.date.DateUtil;
 import com.sc.util.encrypt.Md5SaltUtil;
 import com.sc.util.page.PageUtil;
 import com.sc.util.string.StringUtil;
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -41,17 +43,27 @@ public class SysUserService {
     /**
      * 新增用户
      */
-    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
     public int save(SysUser sysUser) {
         sysUser.setRandomCode(RandomCodeUtil.createRandomCode(6));
         Md5SaltUtil md5SaltUtil = new Md5SaltUtil(sysUser.getRandomCode());
         sysUser.setUserPassword(md5SaltUtil.encode("123456"));
+        addAvatorPath(sysUser);
+        int key = sysUserDao.save(sysUser);
+        int flag = sysUserRoleDao.batchAdd(createUsersRolesList(key, sysUser.getRoles()));
+        return flag;
+    }
+
+    /**
+     * 填充用户头像地址，并上传头像
+     */
+    public void addAvatorPath(SysUser sysUser) {
         //保存头像
         String file = sysUser.getUserAvatar();
         if (StringUtil.isNullOrEmpty(file)) {
             //默认头像
             sysUser.setUserAvatar("https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif");
-        } else {
+        } else if (file.indexOf("base64") > -1) {
             //配置文件图片上传路径
             String filePath = pubConfig.getImageUploadPath();
             String saveUrl = File.separator + "users" + File.separator + DateUtil.getShortSystemDate() + File.separator;
@@ -67,15 +79,14 @@ public class SysUserService {
             Base64Util.generateImage(fileImageData, filePath + saveUrl + newFileName);
             sysUser.setUserAvatar(pubConfig.getImageServer() + saveUrl + newFileName);
         }
-        int key = sysUserDao.save(sysUser);
-        int flag = sysUserRoleDao.batchAdd(createUsersRolesList(key, sysUser.getRoles()));
-        return flag;
     }
 
     /**
      * 修改用户信息
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
     public int updateById(SysUser sysUser) {
+        addAvatorPath(sysUser);
         int flag = sysUserDao.updateById(sysUser);
         flag += sysUserRoleDao.deleteByUserId(sysUser.getId());
         flag += sysUserRoleDao.batchAdd(createUsersRolesList(sysUser.getId(), sysUser.getRoles()));
@@ -89,6 +100,9 @@ public class SysUserService {
         String[] roleArray = roles.split("@");
         List<SysUsersRoles> list = new ArrayList<>();
         for (String temp : roleArray) {
+            if (StringUtil.isNullOrEmpty(temp)) {
+                continue;
+            }
             SysUsersRoles sysUsersRoles = new SysUsersRoles();
             sysUsersRoles.setUserId(userId);
             sysUsersRoles.setRoleId(Integer.valueOf(temp));
@@ -123,6 +137,7 @@ public class SysUserService {
     /**
      * 删除用户
      */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
     public int deleteById(Integer id) {
         int flag = sysUserDao.deleteById(id);
         flag += sysUserRoleDao.deleteByUserId(id);
@@ -134,7 +149,19 @@ public class SysUserService {
      * 根据id查询
      */
     public SysUser getById(Integer id) {
-        return sysUserDao.getById(id);
+        List<SysRole> roleList = sysUserRoleDao.listRolesByUserId(id);
+        StringBuffer roles = new StringBuffer();
+        for (SysRole role : roleList) {
+            roles.append(role.getId());
+            roles.append("@");
+        }
+        SysUser sysUser = sysUserDao.getById(id);
+        if (sysUser != null && StringUtil.isNotNullOrEmpty(roles.toString())) {
+            sysUser.setRoles(roles.toString().substring(0, roles.length() - 1));
+        } else {
+            sysUser.setRoles("");
+        }
+        return sysUser;
     }
 
     /**
