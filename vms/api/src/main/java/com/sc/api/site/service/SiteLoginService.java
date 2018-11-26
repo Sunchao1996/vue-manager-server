@@ -56,14 +56,18 @@ public class SiteLoginService {
         webSession.setToken(uuid);
         webSession.setStatus(String.valueOf(sysUser.getUserStatus()));
         webSession.setUser(sysUser.getUserName());
+        webSession.setUserRealName(sysUser.getUserRealName());
         //获取所有角色
         List<SysRole> roleList = sysUserRoleDao.listRolesByUserId(sysUser.getId());
         StringBuffer roles = new StringBuffer();
         StringBuffer resources = new StringBuffer();
         StringBuffer manageUrl = new StringBuffer();
+        StringBuffer roleName = new StringBuffer();
         for (SysRole roleTemp : roleList) {
             roles.append(roleTemp.getRoleCode());
             roles.append("@");
+            roleName.append(roleTemp.getRoleName());
+            roleName.append("@");
             //获取所有资源
             List<SysResource> resourceList = sysRoleResourceDao.listResourcesByRoleId(roleTemp.getId());
             for (SysResource resourceTemp : resourceList) {
@@ -75,6 +79,7 @@ public class SiteLoginService {
                 }
             }
         }
+        webSession.setRoleName(roleName.toString());
         webSession.setRoles(roles.toString().split("@"));
         webSession.setResources(resources.toString());
         webSession.setManageUrl(manageUrl.toString());

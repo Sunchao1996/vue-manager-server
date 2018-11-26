@@ -25,6 +25,8 @@ public class WebSession implements Serializable {
     private Integer userId;
     @JsonIgnore
     private String manageUrl;//用来校验是否允许访问这个请求地址
+    private String userRealName;//页面上显示的用户真实姓名
+    private String roleName;//页面上显示的用户角色名称用@分隔
 
     @Override
     public String toString() {
@@ -40,7 +42,27 @@ public class WebSession implements Serializable {
                 ", ip='" + ip + '\'' +
                 ", userId=" + userId +
                 ", manageUrl='" + manageUrl + '\'' +
+                ", userRealName='" + userRealName + '\'' +
+                ", roleName='" + roleName + '\'' +
                 '}';
+    }
+
+    public String getUserRealName() {
+        return userRealName;
+    }
+
+    public WebSession setUserRealName(String userRealName) {
+        this.userRealName = userRealName;
+        return this;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public WebSession setRoleName(String roleName) {
+        this.roleName = roleName;
+        return this;
     }
 
     public String getUser() {
