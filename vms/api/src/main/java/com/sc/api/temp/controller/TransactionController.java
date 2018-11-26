@@ -1,6 +1,5 @@
 package com.sc.api.temp.controller;
 
-import com.sc.api.sys.dto.SysUserDto;
 import com.sc.api.temp.model.Transaction;
 import com.sc.util.code.EnumReturnCode;
 import com.sc.util.json.JsonResult;
