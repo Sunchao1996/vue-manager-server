@@ -1,6 +1,7 @@
 package com.sc.api.sys.controller;
 
 import com.sc.common.page.PageDto;
+import com.sc.sys.model.SysPwd;
 import com.sc.sys.model.SysUser;
 import com.sc.sys.service.SysUserService;
 import com.sc.sys.vo.SysUserSearchVO;
@@ -145,5 +146,21 @@ public class SysUserController {
     public JsonResult getById(@RequestBody SysUser sysUser) {
         SysUser getObj = sysUserService.getById(sysUser.getId());
         return new JsonResult(EnumReturnCode.SUCCESS_INFO_GET, getObj);
+    }
+
+    /**
+     * 用户修改密码
+     *
+     * @param sysPwd
+     * @return
+     */
+    @RequestMapping(value = "/updateUserPwd", method = RequestMethod.POST)
+    public JsonResult updateUserPwd(@RequestBody SysPwd sysPwd) {
+        int flag = sysUserService.updateUserPwd(sysPwd);
+        if (flag > 0) {
+            return new JsonResult(EnumReturnCode.SUCCESS_OPERA);
+        } else {
+            return new JsonResult(EnumReturnCode.FAIL_OPERA);
+        }
     }
 }

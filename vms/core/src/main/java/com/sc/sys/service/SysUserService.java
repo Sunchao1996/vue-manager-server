@@ -3,10 +3,7 @@ package com.sc.sys.service;
 import com.sc.core.pub.PubConfig;
 import com.sc.sys.dao.SysUserDao;
 import com.sc.sys.dao.SysUserRoleDao;
-import com.sc.sys.model.SysRole;
-import com.sc.sys.model.SysRolesResources;
-import com.sc.sys.model.SysUser;
-import com.sc.sys.model.SysUsersRoles;
+import com.sc.sys.model.*;
 import com.sc.sys.vo.SysUserSearchVO;
 import com.sc.util.base64.Base64Util;
 import com.sc.util.code.RandomCodeUtil;
@@ -45,13 +42,24 @@ public class SysUserService {
      */
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
     public int save(SysUser sysUser) {
-        sysUser.setRandomCode(RandomCodeUtil.createRandomCode(6));
-        Md5SaltUtil md5SaltUtil = new Md5SaltUtil(sysUser.getRandomCode());
-        sysUser.setUserPassword(md5SaltUtil.encode("123456"));
+        addPwd(sysUser);
         addAvatorPath(sysUser);
         int key = sysUserDao.save(sysUser);
         int flag = sysUserRoleDao.batchAdd(createUsersRolesList(key, sysUser.getRoles()));
         return flag;
+    }
+
+    /**
+     * 填充密码和随机数
+     */
+    private void addPwd(SysUser sysUser) {
+        sysUser.setRandomCode(RandomCodeUtil.createRandomCode(6));
+        Md5SaltUtil md5SaltUtil = new Md5SaltUtil(sysUser.getRandomCode());
+        if (StringUtil.isNullOrEmpty(sysUser.getUserPassword())) {
+            sysUser.setUserPassword(md5SaltUtil.encode("123456"));
+        } else {
+            sysUser.setUserPassword(md5SaltUtil.encode(sysUser.getUserPassword()));
+        }
     }
 
     /**
@@ -224,5 +232,30 @@ public class SysUserService {
         Md5SaltUtil md5SaltUtil = new Md5SaltUtil(random);
         String pwd = md5SaltUtil.encode("123456");
         return sysUserDao.updateResetPwd(userId, pwd, random);
+    }
+
+    /**
+     * 用户修改密码
+     *
+     * @param sysPwd
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
+    public int updateUserPwd(SysPwd sysPwd) {
+        if (StringUtil.isNullOrEmpty(sysPwd.getNewUserPwd()) || StringUtil.isNullOrEmpty(sysPwd.getSureNewUserPwd()) || StringUtil.isNullOrEmpty(sysPwd.getUserName())) {
+            return -1;
+        }
+        if (!sysPwd.getNewUserPwd().equals(sysPwd.getSureNewUserPwd())) {
+            return -1;
+        }
+        SysUser sysUser = sysUserDao.getByUserName(sysPwd.getUserName());
+        Md5SaltUtil md5SaltUtil = new Md5SaltUtil(sysUser.getRandomCode());
+        if (sysUser.getUserPassword().equals(md5SaltUtil.encode(sysPwd.getUserPwd()))) {
+            sysUser.setUserPassword(sysPwd.getNewUserPwd());
+            addPwd(sysUser);
+            return sysUserDao.updateResetPwd(sysUser.getId(), sysUser.getUserPassword(), sysUser.getRandomCode());
+        } else {
+            return -1;
+        }
     }
 }
