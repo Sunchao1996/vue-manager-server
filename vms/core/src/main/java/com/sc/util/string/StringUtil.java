@@ -1,7 +1,6 @@
 package com.sc.util.string;
 
 import com.sc.util.date.DateUtil;
-import net.sourceforge.pinyin4j.PinyinHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -347,28 +346,6 @@ public class StringUtil {
         return b.setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
     }
 
-    /**
-     * 提取每个汉字的首字母(大写)
-     *
-     * @param str
-     * @return
-     */
-    public static String getPinYinHeadChar(String str) {
-        if (isNull(str)) {
-            return "";
-        }
-        String convert = "";
-        char word = str.charAt(0);
-        // 提取汉字的首字母
-        String[] pinyinArray = PinyinHelper.toHanyuPinyinStringArray(word);
-        if (pinyinArray != null) {
-            convert += pinyinArray[0].charAt(0);
-        } else {
-            convert += word;
-        }
-        convert = string2AllTrim(convert);
-        return convert.toUpperCase();
-    }
 
     /*
      * 判断字符串是否为空
